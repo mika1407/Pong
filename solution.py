@@ -129,6 +129,18 @@ def handle_paddle_movement(keys, left_paddle, right_paddle):
     if keys[pygame.K_DOWN] and right_paddle.y + right_paddle.VEL + right_paddle.height <= HEIGHT:
         right_paddle.move(up=False)
 
+# AI:n liikkeitä varten voidaan käyttää yksinkertaista logiikkaa, joka liikuttaa mailaa kohti palloa.
+def handle_ai_movement(ball, right_paddle):
+    # Lasketaan mailan keskikohta
+    paddle_center = right_paddle.y + right_paddle.height / 2
+    
+    # Jos pallo on mailan keskikohdan yläpuolella, liikuta mailaa ylös
+    if ball.y < paddle_center and right_paddle.y - right_paddle.VEL >= 0:
+        right_paddle.move(up=True)
+    
+    # Jos pallo on mailan keskikohdan alapuolella, liikuta mailaa alas
+    elif ball.y > paddle_center and right_paddle.y + right_paddle.VEL + right_paddle.height <= HEIGHT:
+        right_paddle.move(up=False)
 
 def main():
     run = True
@@ -136,6 +148,9 @@ def main():
 
     left_paddle = Paddle(10, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT)
     right_paddle = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT)
+    
+    right_paddle.VEL = 2  # Tämä tekee AI-mailasta hitaamman kuin vasemmasta
+    
     ball = Ball(WIDTH//2, HEIGHT//2, BALL_RADIUS)
 
     left_score = 0
@@ -151,7 +166,17 @@ def main():
                 break
 
         keys = pygame.key.get_pressed()
-        handle_paddle_movement(keys, left_paddle, right_paddle)
+        #handle_paddle_movement(keys, left_paddle, right_paddle)
+
+        # Uusi koodi:
+        # Vain vasen pelaaja käyttää näppäimiä
+        if keys[pygame.K_w] and left_paddle.y - left_paddle.VEL >= 0:
+            left_paddle.move(up=True)
+        if keys[pygame.K_s] and left_paddle.y + left_paddle.VEL + left_paddle.height <= HEIGHT:
+            left_paddle.move(up=False)
+
+        # Oikea pelaaja on nyt AI
+        handle_ai_movement(ball, right_paddle)
 
         ball.move()
         handle_collision(ball, left_paddle, right_paddle)
