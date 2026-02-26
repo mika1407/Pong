@@ -12,7 +12,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 PADDLE_WIDTH, PADDLE_HEIGHT = 20, 100
-BALL_RADIUS = 7
+BALL_RADIUS = 20  # Oli aiemmin 7
 
 SCORE_FONT = pygame.font.SysFont("comicsans", 50)
 WINNING_SCORE = 10
@@ -54,8 +54,17 @@ class Ball:
         self.x_vel = self.MAX_VEL
         self.y_vel = 0
 
+    # Ladataan kuva assets-kansiosta
+        self.image = pygame.image.load("assets/pallo.png")
+        
+        # Skaalataan kuva pallon koon mukaiseksi (halkaisija = säde * 2)
+        self.image = pygame.transform.scale(self.image, (radius * 2, radius * 2))
+
     def draw(self, win):
-        pygame.draw.circle(win, self.COLOR, (self.x, self.y), self.radius)
+        #pygame.draw.circle(win, self.COLOR, (self.x, self.y), self.radius)
+        # Piirretään kuva niin, että sen keskikohta on pallon koordinaateissa
+        # Vähennetään säde x:stä ja y:stä, jotta kuva keskitetään oikein
+        win.blit(self.image, (self.x - self.radius, self.y - self.radius))
 
     def move(self):
         self.x += self.x_vel
@@ -150,7 +159,7 @@ def main():
     right_paddle = Paddle(WIDTH - 10 - PADDLE_WIDTH, HEIGHT//2 - PADDLE_HEIGHT//2, PADDLE_WIDTH, PADDLE_HEIGHT)
     
     right_paddle.VEL = 2  # Tämä tekee AI-mailasta hitaamman kuin vasemmasta
-    
+
     ball = Ball(WIDTH//2, HEIGHT//2, BALL_RADIUS)
 
     left_score = 0
